@@ -3,9 +3,8 @@ package com.example.service;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
@@ -15,10 +14,8 @@ import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
 
 import io.grpc.Deadline;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.xml.bind.DatatypeConverter;
+import io.jsonwebtoken.security.Keys;
 import net.devh.boot.grpc.server.service.GrpcService;
 import net.grpc.lib.TokenReply;
 import net.grpc.lib.TokenRequest;
@@ -29,7 +26,8 @@ import io.grpc.Context;
 @GrpcService
 public class GrpcServerService extends TokenImplBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrpcServerService.class);
-    private String secretKey = "ThisisGrpcAcessToken";
+    private byte[] keyBytes = "ThisisgrpcTokenSecretKey!!!!!!!!".getBytes();
+    
     private long expiryTime = 3600;
 
     @Override
@@ -37,14 +35,11 @@ public class GrpcServerService extends TokenImplBase {
         try {
             LOGGER.info("(req_token) {}", toJson(request.toBuilder()));
 
-            // sendA999UnkownError(request, responseObserver);
-            TokenReply.Builder builder = TokenReply.newBuilder().setAccessToken(makeToken(request.getId(), request.getPassword())).setExpiresIn(expiryTime);
+            TokenReply.Builder builder = TokenReply.newBuilder().setAccessToken(makeToken(request.getId())).setExpiresIn(expiryTime);
 
             responseObserver.onNext(builder.build());
             responseObserver.onCompleted();
 
-            
-    
             LOGGER.info("(res_token) {}", toJson(builder));
 
         } catch (IOException e) {
@@ -72,7 +67,7 @@ public class GrpcServerService extends TokenImplBase {
         if (!isNotDeadlineExpired(Context.current())) {
             // A999 Unknown error
             LOGGER.info("isNotDeadlineExpired");
-            TokenReply.Builder builder = TokenReply.newBuilder().setAccessToken(makeToken(request.getId(), request.getPassword())).setExpiresIn(expiryTime);
+            TokenReply.Builder builder = TokenReply.newBuilder().setAccessToken(makeToken(request.getId())).setExpiresIn(expiryTime);
             responseObserver.onNext(builder.build());
             responseObserver.onCompleted();
 
@@ -83,29 +78,15 @@ public class GrpcServerService extends TokenImplBase {
         }
     }
 
-	public synchronized String  makeToken(String id, String password){
-		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        Date expireDate = new Date();        
-        long expireIn = expireDate.getTime() + 1000 * expiryTime;
-        expireDate.setTime(expireIn);
-        
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
-        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-        
-        Map<String, Object> headerMap = new HashMap<String, Object>();
+	public synchronized String  makeToken(String id){
+        Key secretKey = new SecretKeySpec(keyBytes, io.jsonwebtoken.SignatureAlgorithm.HS256.getJcaName());
+		Date expiration = new Date(System.currentTimeMillis() + 3600000);
 
-        headerMap.put("typ","JWT");
-        headerMap.put("alg","HS256");
-
-        Map<String, Object> map= new HashMap<String, Object>();
-        map.put("id", id);
-        map.put("password", password);
-
-        JwtBuilder builder = Jwts.builder().setHeader(headerMap)
-                .setClaims(map)
-                .setExpiration(expireDate)
-                .signWith(signatureAlgorithm, signingKey);
-        return builder.compact();
+        return Jwts.builder()
+                .claim("id", id)
+                .setExpiration(expiration)
+                .signWith(secretKey)
+                .compact();
 	}
     
     public static String toJson(MessageOrBuilder messageOrBuilder) throws IOException {

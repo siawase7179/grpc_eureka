@@ -1,6 +1,22 @@
 grpc:
   server:
     port: 9898
+    shutdown-grace-period: -1
+    enable-keep-alive: true
+    permit-keep-alive-without-calls: true
+
+
+spring:
+  main:
+    web-application-type: none
+  application:
+    name: grpc-auth-server
+  config:
+      import: "optional:configserver:"
+  cloud:
+    config:
+      uri: http://localhost:8889/admin
+      name: grpc-auth-server
 
 # Management #
 management:
@@ -16,7 +32,11 @@ management:
 logging:
   level:
     root: INFO
-    "[org.springframework.web]": TRACE
+    org.springframework.web: TRACE
+  file:
+    path: ./logs
+    name: grpc-auth-server.log
+    
 
 # Eureka #
 eureka:
@@ -24,7 +44,7 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: http://${eureka.instance.ip-address:39.117.41.75}:${eureka.port:8761}/eureka/
+      defaultZone: http://${eureka.instance.ip-address:localhost}:${eureka.port:8761}/eureka/
   instance:
     status-page-url-path: ${management.endpoints.web.base-path}/info
     health-check-url-path: ${management.endpoints.web.base-path}/health

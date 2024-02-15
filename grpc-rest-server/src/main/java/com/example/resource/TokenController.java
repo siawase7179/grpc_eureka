@@ -32,7 +32,7 @@ public class TokenController {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE
         )
-    public String requestToken(@RequestHeader("X-IB-Id")String id, @RequestHeader("X-IB-Password")String password) throws IOException {
+    public String requestToken(@RequestHeader("X-Client-Id")String id, @RequestHeader("X-Client-Password")String password) throws IOException {
         TokenRequest tokenRequest = TokenRequest.newBuilder().setId(id).setPassword(password).build();
         TokenReply tokenReply = grpcClientService.requestToken(tokenRequest);
         return toJson(tokenReply.toBuilder());

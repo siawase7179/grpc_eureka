@@ -1,6 +1,19 @@
 server:
   port: 8002
 
+spring:
+  main:
+    banner-mode: off
+    web-application-type: servlet
+  application:
+    name: grpc-rest-server
+  config:
+      import: "optional:configserver:"
+  cloud:
+    config:
+      uri: http://localhost:8889/admin
+      name: grpc-rest-server
+
 # Management #
 management:
   server:  
@@ -16,17 +29,18 @@ logging:
   level:
     root: INFO
     org.springframework.web: TRACE
-
-gpring:
-  application:
-    name: grpc-rest-server
+  file:
+    path: ./logs
+    name: grpc-rest-server.log
     
 grpc:
   client:
     grpc-auth-server:
+      address: 'discovery:///grpc-auth-server'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
-      negotiationType: plaintext
+      negotiation-type: PLAINTEXT
+
 
 # Eureka #
 eureka:
@@ -34,7 +48,7 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: http://${eureka.instance.ip-address:39.117.41.75}:${eureka.port:8761}/eureka/
+      defaultZone: http://${eureka.instance.ip-address:localhost}:${eureka.port:8761}/eureka/
   instance:
     status-page-url-path: ${management.endpoints.web.base-path}/info
     health-check-url-path: ${management.endpoints.web.base-path}/health
@@ -44,6 +58,7 @@ eureka:
     waitTimeInMsWhenSyncEmpty: 0 
     response-cache-update-interval-ms: 1000
     peer-eureka-nodes-update-interval-ms: 60000  
+
 
 # ribbon:
 #   eager-load:
