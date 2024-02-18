@@ -24,8 +24,12 @@ import net.grpc.lib.TokenRequest;
 @RequestMapping(value = "/auth")
 public class TokenController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenController.class);
+    private final GrpcClientService grpcClientService;
+
     @Autowired
-    private GrpcClientService grpcClientService;
+    public TokenController (GrpcClientService grpcClientService){
+        this.grpcClientService = grpcClientService;
+    }
 
     @RequestMapping(
         value = "/token",
