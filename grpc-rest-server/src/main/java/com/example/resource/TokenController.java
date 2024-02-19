@@ -21,7 +21,7 @@ import net.grpc.lib.TokenRequest;
 
 
 @RestController
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/v1")
 public class TokenController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenController.class);
     private final GrpcClientService grpcClientService;

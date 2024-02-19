@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.security.Key;
 import java.util.Date;
 
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.junit.jupiter.api.Test;
@@ -16,8 +15,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-
 
 
 public class AuthServerApplicationTest {

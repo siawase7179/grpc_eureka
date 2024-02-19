@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import com.google.protobuf.util.JsonFormat;
 
 import io.grpc.Deadline;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import net.devh.boot.grpc.server.service.GrpcService;
 import net.grpc.lib.TokenReply;
 import net.grpc.lib.TokenRequest;
